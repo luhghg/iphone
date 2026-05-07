@@ -14,3 +14,10 @@ async def create_user(session: AsyncSession, user_data: User) -> User:
     await session.commit()
     await session.refresh(user_data)
     return user_data
+
+async def get_by_id(session: AsyncSession, id: int):
+    query = (
+        select(User)
+        .where(User.id == id))
+    result = await session.execute(query)
+    return result.scalar_one_or_none()
