@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 from app.routers import auth_router
+from app.db.session import async_engine as engine
+from app.core.admin import setup_admin 
 
 app = FastAPI()
 
@@ -14,7 +16,7 @@ app.add_middleware(
 
 
 app.include_router(auth_router.router)
-
+setup_admin(app, engine)
 
 
 
