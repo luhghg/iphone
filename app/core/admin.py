@@ -7,6 +7,7 @@ from app.db.session import async_engine as engine
 from app.models.bd_models import User
 from app.services.auth_services import verify_password
 from app.core.config import settings 
+from app.models.bd_models import Category
 
 # 1. Логіка захисту адмінки
 class AdminAuth(AuthenticationBackend):
@@ -53,6 +54,15 @@ class UserAdmin(ModelView, model=User):
     form_excluded_columns = [User.hashed_password]
 
 
+class CategoryAdmin(ModelView, model=Category):
+    name = "Категорія"
+    name_plural = "Категорії"
+    icon = "fa-solid fa-list"
+    
+    column_list = [Category.id, Category.name, Category.slug, Category.created_at]
+    column_searchable_list = [Category.name, Category.slug]
+    column_sortable_list = [Category.id]
+
 # 3. Головна функція для підключення
 def setup_admin(app, engine):
     # Створюємо бекенд авторизації (secret_key може бути будь-який рядок)
@@ -63,7 +73,7 @@ def setup_admin(app, engine):
     
     # Додаємо наші в’юхи
     admin.add_view(UserAdmin)
-
+    admin.add_view(CategoryAdmin)
     
 
 # Реєструємо їх
