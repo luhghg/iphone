@@ -46,6 +46,13 @@ async def get_current_user(session: AsyncSession = Depends(get_session), credent
     return func_get_id
 
 
+async def get_current_admin(session: AsyncSession = Depends(get_session), credentials: HTTPAuthorizationCredentials = Depends(oauth2_scheme)) -> User:
+    user = await get_current_user(session=session, credentials=credentials)
+    if user.role != "admin":
+        raise HTTPException(status_code=403, detail="Not enough permissions")
+    return user
+
+
 async def register_user(session: AsyncSession, user_data: UserCreate) -> UserResponse:
     if await get_user_by_email(session=session, email=user_data.email):
         raise HTTPException(status_code=400, detail="Email already registered")
@@ -70,5 +77,5 @@ async def login_user(session: AsyncSession, login_data: UserLogin) -> Token:
 
 
  
-# 
+
  
