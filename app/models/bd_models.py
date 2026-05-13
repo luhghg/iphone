@@ -1,5 +1,5 @@
 from app.db.session import Base
-from sqlalchemy.orm import Mapped, mapped_column 
+from sqlalchemy.orm import Mapped, mapped_column , relationship
 from sqlalchemy import String, func, ForeignKey
 from datetime import datetime
 
@@ -35,16 +35,29 @@ class Category(Base):
     slug: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
 
+    product = relationship("Product", back_populates="category", lazy="selectin")
+
+    def __str__(self):
+        return self.name
+
+
 
 class Product(Base):
     __tablename__ = "products"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
-    description: Mapped[str] = mapped_column(String(1024), nullable=True)
+    description: Mapped[str] = mapped_column(String(1024))
     is_active: Mapped[bool] = mapped_column(default=True)
     category_id: Mapped[int] = mapped_column(ForeignKey("categories.id"), nullable=False)
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
+    
+    category = relationship("Category", back_populates="product")
+    variants = relationship("ProductVariant", back_populates="product", lazy="selectin")
+
+    def __str__(self):
+        return self.name
+
 
 
 class ProductVariant(Base):
@@ -57,6 +70,9 @@ class ProductVariant(Base):
     storage: Mapped[str] = mapped_column(String(255), nullable=True)
     color: Mapped[str] = mapped_column(String(255), nullable=True)
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
+
+    product = relationship("Product", lazy="selectin")
+
 
 
 

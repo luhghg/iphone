@@ -4,7 +4,7 @@ from starlette.requests import Request
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.session import async_engine as engine  
-from app.models.bd_models import User
+from app.models.bd_models import Product, ProductVariant, User
 from app.services.auth_services import verify_password
 from app.core.config import settings 
 from app.models.bd_models import Category
@@ -63,6 +63,28 @@ class CategoryAdmin(ModelView, model=Category):
     column_searchable_list = [Category.name, Category.slug]
     column_sortable_list = [Category.id]
 
+
+class ProductAdmin(ModelView, model=Product):
+    name = "Продукт"
+    name_plural = "Продукти"
+    icon = "fa-solid fa-box"
+    
+    column_list = [Product.id, Product.name, Product.description, Product.is_active, Product.category_id, Product.created_at]
+    form_columns = ["name", "description", "is_active", "category"]
+    column_searchable_list = [Product.name, Product.description]
+    column_sortable_list = [Product.id]
+
+
+class ProductVariantAdmin(ModelView, model=ProductVariant):
+    name = "Варіант продукту"
+    name_plural = "Варіанти продуктів"
+    icon = "fa-solid fa-boxes-stacked"
+    
+    column_list = [ProductVariant.id, ProductVariant.product_id, ProductVariant.price, ProductVariant.stock, ProductVariant.storage, ProductVariant.color]
+    form_columns = ["product", "price", "stock", "storage", "color"]
+    column_searchable_list = [ProductVariant.storage, ProductVariant.color]
+    column_sortable_list = [ProductVariant.id]
+
 # 3. Головна функція для підключення
 def setup_admin(app, engine):
     # Створюємо бекенд авторизації (secret_key може бути будь-який рядок)
@@ -74,7 +96,8 @@ def setup_admin(app, engine):
     # Додаємо наші в’юхи
     admin.add_view(UserAdmin)
     admin.add_view(CategoryAdmin)
-    
+    admin.add_view(ProductAdmin)
+    admin.add_view(ProductVariantAdmin)
 
 # Реєструємо їх
 # admin.add_view(UserAdmin)
