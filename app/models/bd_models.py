@@ -54,6 +54,7 @@ class Product(Base):
     
     category = relationship("Category", back_populates="product")
     variants = relationship("ProductVariant", back_populates="product", lazy="selectin")
+    image = relationship("ProductImage", back_populates="product", lazy="selectin")
 
     def __str__(self):
         return self.name
@@ -84,6 +85,11 @@ class ProductImage(Base):
     image_url: Mapped[str] = mapped_column(String(1024), nullable=False)
     is_main: Mapped[bool] = mapped_column(default=False)
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
+
+    product = relationship("Product", lazy="selectin")
+
+    def __str__(self):
+        return self.name
 
 
 

@@ -4,7 +4,7 @@ from starlette.requests import Request
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.session import async_engine as engine  
-from app.models.bd_models import Product, ProductVariant, User
+from app.models.bd_models import Product, ProductVariant, User, ProductImage
 from app.services.auth_services import verify_password
 from app.core.config import settings 
 from app.models.bd_models import Category
@@ -85,6 +85,18 @@ class ProductVariantAdmin(ModelView, model=ProductVariant):
     column_searchable_list = [ProductVariant.storage, ProductVariant.color]
     column_sortable_list = [ProductVariant.id]
 
+
+class ProductImageAdmin(ModelView, model=ProductImage):
+    name = "Фото продукту"
+    name_plural = "Фото продуктів"
+    icon = "fa-solid fa-images"
+
+    column_list = [ProductImage.id, ProductImage.product_id, ProductImage.image_url, ProductImage.is_main, ProductImage.created_at]
+    form_columns = ["product", "image_url", "is_main"]
+    column_searchable_list = [ProductImage.product_id, ProductImage.image_url]
+    column_sortable_list = [ProductImage.id]
+
+
 # 3. Головна функція для підключення
 def setup_admin(app, engine):
     # Створюємо бекенд авторизації (secret_key може бути будь-який рядок)
@@ -98,6 +110,7 @@ def setup_admin(app, engine):
     admin.add_view(CategoryAdmin)
     admin.add_view(ProductAdmin)
     admin.add_view(ProductVariantAdmin)
+    admin.add_view(ProductImageAdmin)
 
 # Реєструємо їх
 # admin.add_view(UserAdmin)
