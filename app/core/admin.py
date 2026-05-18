@@ -4,10 +4,10 @@ from starlette.requests import Request
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.session import async_engine as engine  
-from app.models.bd_models import Product, ProductVariant, User, ProductImage
+from app.models.bd_models import Product, ProductVariant, User, ProductImage, Cart, CartItem, Category
 from app.services.auth_services import verify_password
 from app.core.config import settings 
-from app.models.bd_models import Category
+
 
 # 1. Логіка захисту адмінки
 class AdminAuth(AuthenticationBackend):
@@ -97,21 +97,35 @@ class ProductImageAdmin(ModelView, model=ProductImage):
     column_sortable_list = [ProductImage.id]
 
 
+class CartAdmin(ModelView, model=Cart):
+    name = "Корзина"
+    name_plural = "Корзини"
+    icon = "fa-solid fa-cart-shopping"
+
+    column_list = [Cart.id, Cart.user_id, Cart.created_at]
+    column_sortable_list = [Cart.id, Cart.created_at]
+
+
+class CartItemAdmin(ModelView, model=CartItem):
+    name = "Елемент корзини"
+    name_plural = "Елементи корзини"
+    icon = "fa-solid fa-bag-shopping"
+
+    column_list = [CartItem.id, CartItem.cart_id, CartItem.product_variant_id, CartItem.quantity, CartItem.created_at]
+    form_columns = ["cart", "product_variant_id", "quantity"]
+    column_sortable_list = [CartItem.id]
+
+
 # 3. Головна функція для підключення
 def setup_admin(app, engine):
-    # Створюємо бекенд авторизації (secret_key може бути будь-який рядок)
     auth_backend = AdminAuth(secret_key=settings.ADMIN_SECRET_KEY)
-    
-    # Створюємо адмінку з захистом
     admin = Admin(app, engine, authentication_backend=auth_backend)
-    
-    # Додаємо наші в’юхи
+
     admin.add_view(UserAdmin)
     admin.add_view(CategoryAdmin)
     admin.add_view(ProductAdmin)
     admin.add_view(ProductVariantAdmin)
     admin.add_view(ProductImageAdmin)
-
-# Реєструємо їх
-# admin.add_view(UserAdmin)
+    admin.add_view(CartAdmin)
+    admin.add_view(CartItemAdmin)
 

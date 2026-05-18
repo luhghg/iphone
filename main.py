@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 from app.routers import (auth_router, category_router,
                          product_router, product_variant_router,
-                         product_image_router)
+                         product_image_router, cart_router)
 from app.db.session import async_engine as engine
 from app.core.admin import setup_admin 
 
@@ -23,6 +23,7 @@ app.include_router(category_router.router)
 app.include_router(product_router.router)
 app.include_router(product_variant_router.router)
 app.include_router(product_image_router.router)
+app.include_router(cart_router.router)
 setup_admin(app, engine)
 
 

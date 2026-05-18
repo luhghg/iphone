@@ -47,6 +47,23 @@ async def get_cart_item_by_id_repo(session: AsyncSession, id: int) -> CartItem:
     return result.scalar_one_or_none()
 
 
+async def get_cart_item_by_variant_repo(session: AsyncSession, cart_id: int, product_variant_id: int) -> CartItem | None:
+    query = (
+        select(CartItem)
+        .where(CartItem.cart_id == cart_id, CartItem.product_variant_id == product_variant_id)
+    )
+    result = await session.execute(query)
+    return result.scalar_one_or_none()
+
+
+async def increment_cart_item_quantity_repo(session: AsyncSession, cart_item: CartItem, amount: int) -> CartItem:
+    cart_item.quantity += amount
+    session.add(cart_item)
+    await session.commit()
+    await session.refresh(cart_item)
+    return cart_item
+
+
 async def update_cart_item_quantity_repo(session: AsyncSession, cart_item : CartItem, quantity: CartItemUpdate) -> CartItem:
     if quantity is not None:
         cart_item.quantity = quantity.quantity

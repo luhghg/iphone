@@ -25,6 +25,8 @@ class Cart(Base):
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False, unique=True)
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
 
+    items = relationship("CartItem", back_populates="cart", lazy="selectin")
+
 
 
 class Category(Base):
@@ -72,7 +74,7 @@ class ProductVariant(Base):
     color: Mapped[str] = mapped_column(String(255), nullable=True)
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
 
-    product = relationship("Product", lazy="selectin")
+    product = relationship("Product", lazy="selectin", back_populates="variants")
 
 
 
@@ -86,10 +88,10 @@ class ProductImage(Base):
     is_main: Mapped[bool] = mapped_column(default=False)
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
 
-    product = relationship("Product", lazy="selectin")
+    product = relationship("Product", lazy="selectin", back_populates="image")
 
     def __str__(self):
-        return self.name
+        return self.image_url
 
 
 
@@ -101,6 +103,8 @@ class CartItem(Base):
     product_variant_id: Mapped[int] = mapped_column(ForeignKey("product_variants.id"), nullable=False)
     quantity: Mapped[int] = mapped_column(default=1)
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
+
+    cart = relationship("Cart", back_populates="items", lazy="selectin")
 
 
 
