@@ -118,6 +118,9 @@ class Order(Base):
     delivery_address: Mapped[str] = mapped_column(String(255), nullable=False)
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
 
+    items = relationship("OrderItem", back_populates="order", lazy="selectin")
+
+
 
 
 class OrderItem(Base):
@@ -129,6 +132,9 @@ class OrderItem(Base):
     quantity: Mapped[int] = mapped_column(default=1)
     price_at_purchase: Mapped[float] = mapped_column(nullable=False)
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
+
+    order = relationship("Order", back_populates="items")
+
 
 
 

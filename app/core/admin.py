@@ -4,7 +4,7 @@ from starlette.requests import Request
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.session import async_engine as engine  
-from app.models.bd_models import Product, ProductVariant, User, ProductImage, Cart, CartItem, Category
+from app.models.bd_models import Product, ProductVariant, User, ProductImage, Cart, CartItem, Category, Order, OrderItem
 from app.services.auth_services import verify_password
 from app.core.config import settings 
 
@@ -116,6 +116,27 @@ class CartItemAdmin(ModelView, model=CartItem):
     column_sortable_list = [CartItem.id]
 
 
+class OrderAdmin(ModelView, model=Order):
+    name = "Замовлення"
+    name_plural = "Замовлення"
+    icon = "fa-solid fa-receipt"
+
+    column_list = [Order.id, Order.user_id, Order.status, Order.total_price, Order.delivery_address, Order.created_at]
+    form_columns = ["user_id", "status", "total_price", "delivery_address"]
+    column_searchable_list = [Order.status, Order.delivery_address]
+    column_sortable_list = [Order.id, Order.created_at, Order.total_price]
+
+
+class OrderItemAdmin(ModelView, model=OrderItem):
+    name = "Елемент замовлення"
+    name_plural = "Елементи замовлення"
+    icon = "fa-solid fa-list-check"
+
+    column_list = [OrderItem.id, OrderItem.order_id, OrderItem.product_variant_id, OrderItem.quantity, OrderItem.price_at_purchase]
+    form_columns = ["order", "product_variant_id", "quantity", "price_at_purchase"]
+    column_sortable_list = [OrderItem.id, OrderItem.order_id]
+
+
 # 3. Головна функція для підключення
 def setup_admin(app, engine):
     auth_backend = AdminAuth(secret_key=settings.ADMIN_SECRET_KEY)
@@ -128,4 +149,6 @@ def setup_admin(app, engine):
     admin.add_view(ProductImageAdmin)
     admin.add_view(CartAdmin)
     admin.add_view(CartItemAdmin)
+    admin.add_view(OrderAdmin)
+    admin.add_view(OrderItemAdmin)
 
