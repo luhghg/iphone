@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     SECRET_KEY: str
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 20
     ADMIN_SECRET_KEY: str
+    REDIS_URL: str
 
     @property
     def DATABASE_URL_asyncpg(self):
