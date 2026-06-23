@@ -1,6 +1,8 @@
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.exc import IntegrityError
 from app.models.bd_models import User
 from sqlalchemy import select
+from fastapi import HTTPException, status
 
 from app.schemas.user_schemas import UserCreate
 
@@ -13,7 +15,11 @@ async def get_user_by_email(session: AsyncSession, email: str) -> User:
 
 async def create_user(session: AsyncSession, user_data: UserCreate) -> User:
     session.add(user_data)
-    await session.commit()
+    try:
+        await session.commit()
+    except IntegrityError:
+        await session.rollback()
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Username or email already exists")
     await session.refresh(user_data)
     return user_data
 
