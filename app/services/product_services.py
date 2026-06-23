@@ -3,13 +3,24 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.schemas.product_schemas import ProductCreate, ProductUpdate
 from fastapi import HTTPException, status
 from app.models.bd_models import Product
+from app.core.redis import redis_client, get_cache, set_cache, delete_cache
+from app.schemas.product_schemas import ProductResponse
 
 
 async def create_new_product(session: AsyncSession, product_data: ProductCreate) -> Product:
-    return await create_product(session=session, product_data=product_data)
+    product = await create_product(session=session, product_data=product_data)
+    await delete_cache("products:all")
+    return product
     
 
 async def get_products(session: AsyncSession, offset: int = 0, limit: int = 100) -> list[Product]:
+    if products := await get_cache("products:all"):
+        return products
+    else:
+        products = await get_all_products(session=session, offset=offset, limit=limit)
+        await set_cache("products:all", [ProductResponse.model_validate(p).model_dump() for p in products])
+        return products
+
     if limit > 100:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Limit cannot exceed 100")
     elif limit < 1:
@@ -37,12 +48,15 @@ async def get_products_by_category_id(session: AsyncSession, category_id: int) -
 
 async def update_product_by_id(session: AsyncSession, id: int, new_product_data: ProductUpdate) -> Product:
     product = await get_product_by_id(session=session, id=id)
-    return await update_product(session=session, product=product, new_product_data=new_product_data)
+    product_udated = await update_product(session=session, product=product, new_product_data=new_product_data)
+    await delete_cache("products:all")
+    return product_udated
 
 
 async def delete_product_by_id(session: AsyncSession, id: int) -> None:
     product = await get_product_by_id(session=session, id=id)
     await delete_product(session=session, product=product)
+    await delete_cache("products:all")
 
 
 

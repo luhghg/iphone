@@ -30,4 +30,4 @@ setup_admin(app, engine)
 
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", reload = True)
+    uvicorn.run(app, host="0.0.0.0", port=8080)
