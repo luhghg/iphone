@@ -1,4 +1,4 @@
-from app.repositories.product_repository import create_product, get_all_products, get_product, get_product_by_category_id, update_product, delete_product
+from app.repositories.product_repository import create_product, get_all_products, get_product, get_product_by_category_id, update_product, delete_product, get_products_by_name
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.schemas.product_schemas import ProductCreate, ProductUpdate
 from fastapi import HTTPException, status
