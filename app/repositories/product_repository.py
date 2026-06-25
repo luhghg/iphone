@@ -35,6 +35,14 @@ async def get_product(session:AsyncSession, id: int) -> Product:
     result = await session.execute(query)
     return result.scalar_one_or_none()
 
+async def get_products_by_name(session, query: str):
+    stmt = (
+        select(Product)
+        .where(Product.name.ilike(f"%{query}%"))
+    )
+    result = await session.execute(stmt)
+    return result.scalars().all()
+
 
 async def get_product_by_category_id(session:AsyncSession, category_id: int) -> list[Product]:
     query = (

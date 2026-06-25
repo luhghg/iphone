@@ -63,7 +63,12 @@ async def delete_product_by_id(session: AsyncSession, id: int) -> None:
     await delete_cache("products:all")
     await delete_cache(f"product:{id}")
 
-
+async def search_products_by_name(session: AsyncSession, query: str) -> list[Product]:
+    if not query:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Query must be provided")
+    if len(query) < 3:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Query must be at least 3 characters long")
+    return await get_products_by_name(session=session, query=query)
 
 
 
