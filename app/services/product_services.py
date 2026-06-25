@@ -21,16 +21,6 @@ async def get_products(session: AsyncSession, offset: int = 0, limit: int = 100)
         await set_cache("products:all", [ProductResponse.model_validate(p).model_dump() for p in products])
         return products
 
-    if limit > 100:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Limit cannot exceed 100")
-    elif limit < 1:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Limit must be at least 1")
-    elif offset < 0:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Offset cannot be negative")
-    elif offset > 1000:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Offset cannot exceed 1000")
-    return await get_all_products(session=session, offset=offset, limit=limit)
-
 
 async def get_product_by_id(session: AsyncSession, id: int) -> Product:
     if product := await get_cache(f"product:{id}"):
